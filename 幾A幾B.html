@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幾A幾B數字猜謎遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://source.unsplash.com/1600x900/?abstract,pattern') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #000;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        #container {
+            display: flex;
+            gap: 20px;
+        }
+
+        #game-container, #history {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 350px;
+        }
+
+        #message {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #ff6347;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #restart-btn {
+            margin-top: 20px;
+            display: none;
+            background-color: #007BFF;
+        }
+
+        #restart-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div id="game-container">
+            <h1>幾A幾B數字猜謎遊戲</h1>
+            <p>請輸入四個不重複的數字：</p>
+            <input type="text" id="userInput" placeholder="如 1234" maxlength="4" />
+            <button onclick="checkGuess()">提交猜測</button>
+            <div id="message"></div>
+            <button id="restart-btn" onclick="restartGame()">重新開始</button>
+        </div>
+
+        <div id="history">
+            <h2>猜測紀錄</h2>
+            <ul id="history-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        function generateSecretNumber() {
+            let digits = [];
+            while (digits.length < 4) {
+                let num = Math.floor(Math.random() * 10).toString();
+                if (!digits.includes(num)) {
+                    digits.push(num);
+                }
+            }
+            return digits.join('');
+        }
+
+        let secretNumber = generateSecretNumber();
+        console.log("秘密數字：", secretNumber); 
+
+        function checkGuess() {
+            let userGuess = document.getElementById("userInput").value;
+            let messageElement = document.getElementById("message");
+            let historyList = document.getElementById("history-list");
+
+            if (!/^\d{4}$/.test(userGuess) || new Set(userGuess).size !== 4) {
+                messageElement.textContent = "請輸入四個不重複的數字！";
+                return;
+            }
+
+            let aCount = 0, bCount = 0;
+            for (let i = 0; i < 4; i++) {
+                if (userGuess[i] === secretNumber[i]) {
+                    aCount++;
+                } else if (secretNumber.includes(userGuess[i])) {
+                    bCount++;
+                }
+            }
+
+            let result = `${userGuess} → ${aCount}A${bCount}B`;
+            let listItem = document.createElement("li");
+            listItem.textContent = result;
+            historyList.appendChild(listItem);
+
+            if (aCount === 4) {
+                messageElement.textContent = "恭喜你猜對了！";
+                document.getElementById("restart-btn").style.display = "block";
+            } else {
+                messageElement.textContent = `${aCount}A${bCount}B，請繼續猜！`;
+            }
+        }
+
+        function restartGame() {
+            secretNumber = generateSecretNumber();
+            console.log("新的秘密數字：", secretNumber);
+            document.getElementById("userInput").value = "";
+            document.getElementById("message").textContent = "";
+            document.getElementById("restart-btn").style.display = "none";
+            document.getElementById("history-list").innerHTML = "";
+        }
+    </script>
+
+</body>
+</html>
